@@ -1,0 +1,34 @@
+# Runtime / secrets
+.env
+.env.*
+!.env.example
+data/*
+!data/.gitkeep
+!data/.gitignore
+*.db
+*.sqlite
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Reports generated locally
+data/reports/
+data/registry.json

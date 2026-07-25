@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solo-empire.local/schema/subscription-registry.json",
+  "title": "SubscriptionRegistry",
+  "type": "object",
+  "required": ["version", "scanned_at", "subscriptions"],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "scanned_at": { "type": ["string", "null"] },
+    "scan_days": { "type": ["integer", "null"] },
+    "source": {
+      "type": "object",
+      "properties": {
+        "gmail_messages_scanned": { "type": "integer" },
+        "signals_extracted": { "type": "integer" },
+        "calendar_events_scanned": { "type": "integer" }
+      }
+    },
+    "subscriptions": {
+      "type": "array",
+      "items": { "$ref": "subscription.schema.json" }
+    },
+    "draft_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action", "subscription_id", "status"],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["cancel", "unsubscribe", "downgrade", "investigate"]
+          },
+          "subscription_id": { "type": "string" },
+          "merchant": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "approved", "done", "rejected"]
+          },
+          "cancellation_url": { "type": ["string", "null"] },
+          "notes": { "type": "string" },
+          "created_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+[project]
+name = "subscription-intelligence"
+version = "0.1.0"
+description = "Read-only subscription intelligence from Gmail + Calendar"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+subscription-intel = "subscription_intelligence.cli.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
