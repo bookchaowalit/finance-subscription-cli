@@ -7,16 +7,24 @@
 
 ## Placement (Solo Empire workspace)
 
-This is a **standalone GitHub product**, not a Solo Empire monorepo package.
+This is a **standalone GitHub product** (own `.git`), not a Solo Empire monorepo package.
+Checkout follows the book-dev hierarchy:
+
+```text
+book-dev/
+└── github/
+    └── bookchaowalit/              # owner
+        └── book-products/
+            └── subscription-intelligence/   # this repo
+```
 
 | Role | Path |
 |------|------|
-| Canonical clone | `~/projects/github/bookchaowalit/book-products/subscription-intelligence` |
-| book-dev discoverability | `solo-empire/domains/product/engineering/book-dev/local/products/subscription-intelligence` → symlink |
-| Monorepo boundary link | `solo-empire/projects/subscription-intelligence` → symlink |
-| Ideal catalog path | `domains/.../book-dev/book-products/` (dir currently root-owned; use local/products + home clone) |
+| **Canonical local clone** | `domains/product/engineering/book-dev/github/bookchaowalit/book-products/subscription-intelligence` |
+| **GitHub** | https://github.com/bookchaowalit/subscription-intelligence |
+| Solo Empire tracking | ignored via `domains/product/engineering/*` — product has its own git |
 
-Catalog entry: `solo-empire/docs/projects/projects.yaml` + `REGISTRY.md`.
+Catalog: `solo-empire/docs/projects/projects.yaml` + `REGISTRY.md`.
 
 ## What it does
 
