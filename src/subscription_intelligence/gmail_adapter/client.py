@@ -2,7 +2,7 @@
 Gmail API adapter — READ ONLY.
 
 Never labels, stars, archives, deletes, or modifies messages.
-Uses Solo Empire OAuth via infra_bridge only.
+Uses Google OAuth via infra_bridge only.
 """
 
 from __future__ import annotations

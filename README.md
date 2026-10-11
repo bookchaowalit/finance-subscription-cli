@@ -79,12 +79,11 @@ subscription-intelligence/
 
 | Need | Source |
 |------|--------|
-| Google OAuth | Solo Empire `.env` via `infra/scripts/utils/_env.py` |
-| HTTP + token refresh | `infra/scripts/utils/_http.py` |
-| Monorepo path | auto-detect or `SOLO_EMPIRE_ROOT` |
+| Google OAuth | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REFRESH_TOKEN` environment variables |
+| HTTP + token refresh | `src/subscription_intelligence/http_util.py` (vendored, stdlib only) |
 | Product data | this repo `data/` only |
 
-Requires a local Solo Empire checkout for credentials (not bundled).
+Credentials are never bundled; supply them through the environment.
 
 ## CLI
 
@@ -95,11 +94,6 @@ Requires a local Solo Empire checkout for credentials (not bundled).
 ./bin/subscription-intel report
 ./bin/subscription-intel renewals --within 90d
 ./bin/subscription-intel report --json
-```
-
-```bash
-# Optional if monorepo is not auto-detected
-export SOLO_EMPIRE_ROOT=~/solo-empire
 ```
 
 ## Safety

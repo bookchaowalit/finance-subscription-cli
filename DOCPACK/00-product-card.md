@@ -22,7 +22,7 @@ owner: Product owner (Book Dev)
 
 ## 3. สิ่งที่ทำได้จริงตอนนี้
 
-- `gmail_adapter/client.py` ค้น Gmail แบบอ่านอย่างเดียวด้วย query ด้านใบเสร็จ/ต่ออายุ ผ่าน OAuth ของ Solo Empire (`infra_bridge`); ไม่เก็บเนื้อหาอีเมลเต็ม
+- `gmail_adapter/client.py` ค้น Gmail แบบอ่านอย่างเดียวด้วย query ด้านใบเสร็จ/ต่ออายุ ผ่าน Google OAuth จาก environment (`infra_bridge`); ไม่เก็บเนื้อหาอีเมลเต็ม
 - `extractors/signals.py`, `calendar_adapter.py`, `subscription_registry/store.py`, `scoring/worth.py` (3 ชั้น), `recommendations/engine.py`, `reports/builder.py`
 - CLI `bin/subscription-intel`; schema JSON 2 ไฟล์; test 1 ไฟล์ (extractors)
 - การยกเลิกเป็นเพียง checklist ร่างให้มนุษย์อนุมัติ

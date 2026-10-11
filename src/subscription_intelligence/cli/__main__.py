@@ -79,7 +79,7 @@ def cmd_scan(args: argparse.Namespace) -> int:
         print(f"   Account: {profile.get('emailAddress')}")
     except Exception as e:
         print(f"❌ Gmail auth failed: {e}", file=sys.stderr)
-        print("   Re-auth: python3 infra/scripts/utils/oauth_reauth.py", file=sys.stderr)
+        print("   Re-auth: refresh GOOGLE_REFRESH_TOKEN in your secret manager", file=sys.stderr)
         return 1
 
     messages = gmail.fetch_subscription_candidates(days=args.days, max_results=args.max)
