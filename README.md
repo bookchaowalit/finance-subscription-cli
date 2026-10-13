@@ -2,7 +2,7 @@
 
 **Status:** MVP (CLI + registry + report)  
 **Temporary name:** Subscription Intelligence  
-**Repo:** https://github.com/bookchaowalit/finance-subscription-cli  
+**Repo:** https://github.com/bookchaowalit/subscription-intelligence  
 **Boundary:** Product logic lives here. Solo Empire `infra/` is an **integration layer only**.
 
 ## Placement (Solo Empire workspace)
@@ -20,8 +20,8 @@ book-dev/
 
 | Role | Path |
 |------|------|
-| **Canonical local clone** | `domains/product/engineering/book-dev/github/bookchaowalit/book-products/finance-subscription-cli` |
-| **GitHub** | https://github.com/bookchaowalit/finance-subscription-cli |
+| **Canonical local clone** | `domains/product/engineering/book-dev/github/bookchaowalit/book-products/subscription-intelligence` |
+| **GitHub** | https://github.com/bookchaowalit/subscription-intelligence |
 | Solo Empire tracking | ignored via `domains/product/engineering/*` — product has its own git |
 
 Catalog: `solo-empire/docs/projects/projects.yaml` + `REGISTRY.md`.
