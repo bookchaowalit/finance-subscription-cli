@@ -1,6 +1,6 @@
 # subscription-intelligence — Product brief
 
-**Slug:** `bookchaowalit/subscription-intelligence`  
+**Slug:** `bookchaowalit/finance-subscription-cli`  
 **Generated:** 2026-08-11 (bulk Book Dev closeout)  
 **Status:** starter / portfolio boundary
 
@@ -26,7 +26,7 @@ See `README.md` for install and run instructions when present.
 
 **Status:** MVP (CLI + registry + report)  
 **Temporary name:** Subscription Intelligence  
-**Repo:** https://github.com/bookchaowalit/subscription-intelligence  
+**Repo:** https://github.com/bookchaowalit/finance-subscription-cli  
 **Boundary:** Product logic lives here. Solo Empire `infra/` is an **integration layer only**.
 
 ## Placement (Solo Empire workspace)
