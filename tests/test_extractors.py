@@ -58,7 +58,10 @@ def test_extract_vercel_renewal():
 
 
 def test_pipeline_scores_and_report():
-    from subscription_intelligence.subscription_registry.store import RegistryStore, empty_registry
+    from subscription_intelligence.subscription_registry.store import (
+        RegistryStore,
+        empty_registry,
+    )
     from subscription_intelligence.extractors.signals import ExtractedSignal
 
     store = RegistryStore(path=Path("/tmp/si-test-registry.json"))

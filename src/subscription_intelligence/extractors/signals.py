@@ -77,13 +77,39 @@ KNOWN_MERCHANTS: dict[str, str] = {
 }
 
 EVENT_PATTERNS: list[tuple[str, re.Pattern[str], float]] = [
-    ("price_increase", re.compile(r"price\s+increase|raising\s+(our\s+)?prices|new\s+pricing", re.I), 0.85),
-    ("trial", re.compile(r"\bfree\s+trial\b|\btrial\s+ends?\b|\btrial\s+expir", re.I), 0.8),
-    ("renewal", re.compile(r"\brenew(s|al|ing)?\b|\bauto[- ]?renew\b|\bwill\s+renew\b", re.I), 0.8),
+    (
+        "price_increase",
+        re.compile(r"price\s+increase|raising\s+(our\s+)?prices|new\s+pricing", re.I),
+        0.85,
+    ),
+    (
+        "trial",
+        re.compile(r"\bfree\s+trial\b|\btrial\s+ends?\b|\btrial\s+expir", re.I),
+        0.8,
+    ),
+    (
+        "renewal",
+        re.compile(r"\brenew(s|al|ing)?\b|\bauto[- ]?renew\b|\bwill\s+renew\b", re.I),
+        0.8,
+    ),
     ("invoice", re.compile(r"\binvoice\b|\bbilling\s+statement\b", re.I), 0.85),
-    ("receipt", re.compile(r"\breceipt\b|\bpayment\s+received\b|\byour\s+payment\b|\bpaid\b", re.I), 0.75),
-    ("cancellation_link", re.compile(r"\bcancel\b|\bunsubscribe\b|\bmanage\s+subscription\b", re.I), 0.55),
-    ("payment", re.compile(r"\bsubscription\b|\bmembership\b|\byour\s+plan\b", re.I), 0.5),
+    (
+        "receipt",
+        re.compile(
+            r"\breceipt\b|\bpayment\s+received\b|\byour\s+payment\b|\bpaid\b", re.I
+        ),
+        0.75,
+    ),
+    (
+        "cancellation_link",
+        re.compile(r"\bcancel\b|\bunsubscribe\b|\bmanage\s+subscription\b", re.I),
+        0.55,
+    ),
+    (
+        "payment",
+        re.compile(r"\bsubscription\b|\bmembership\b|\byour\s+plan\b", re.I),
+        0.5,
+    ),
 ]
 
 AMOUNT_RE = re.compile(
@@ -92,7 +118,10 @@ AMOUNT_RE = re.compile(
     re.I,
 )
 
-CYCLE_RE = re.compile(r"\b(monthly|annual|yearly|per\s+year|per\s+month|/mo|/yr|year(?:ly)?|month(?:ly)?)\b", re.I)
+CYCLE_RE = re.compile(
+    r"\b(monthly|annual|yearly|per\s+year|per\s+month|/mo|/yr|year(?:ly)?|month(?:ly)?)\b",
+    re.I,
+)
 
 URL_RE = re.compile(r"https?://[^\s<>\"']+", re.I)
 
@@ -129,7 +158,9 @@ class ExtractedSignal:
 def extract_signals_from_message(msg: MessageMeta) -> list[ExtractedSignal]:
     text = f"{msg.subject} {msg.snippet}"
     event_type, base_conf = _detect_event(text)
-    merchant, normalized = _detect_merchant(msg.from_address, msg.from_name, msg.subject)
+    merchant, normalized = _detect_merchant(
+        msg.from_address, msg.from_name, msg.subject
+    )
     if not merchant:
         return []
 
@@ -189,7 +220,9 @@ def _detect_event(text: str) -> tuple[str | None, float]:
     return None, 0.0
 
 
-def _detect_merchant(from_addr: str, from_name: str, subject: str) -> tuple[str | None, str]:
+def _detect_merchant(
+    from_addr: str, from_name: str, subject: str
+) -> tuple[str | None, str]:
     addr = (from_addr or "").lower()
     domain = addr.split("@")[-1] if "@" in addr else ""
     # strip common mail subdomains
@@ -212,25 +245,76 @@ def _detect_merchant(from_addr: str, from_name: str, subject: str) -> tuple[str 
 
     # Prefer registrable brand from domain before noisy display names
     # ("Chelsea with IFTTT" → prefer ifttt from domain)
-    if domain and domain not in {"gmail.com", "googlemail.com", "outlook.com", "yahoo.com"}:
-        labels = [p for p in domain.split(".") if p not in {"email", "mail", "e", "t", "mp1", "news", "updates", "noreply", "no-reply", "notification", "notifications", "accounts", "billing", "support"}]
+    if domain and domain not in {
+        "gmail.com",
+        "googlemail.com",
+        "outlook.com",
+        "yahoo.com",
+    }:
+        labels = [
+            p
+            for p in domain.split(".")
+            if p
+            not in {
+                "email",
+                "mail",
+                "e",
+                "t",
+                "mp1",
+                "news",
+                "updates",
+                "noreply",
+                "no-reply",
+                "notification",
+                "notifications",
+                "accounts",
+                "billing",
+                "support",
+            }
+        ]
         if labels:
-            brand = labels[-2] if len(labels) >= 2 and labels[-1] in {"com", "io", "co", "net", "ai", "app", "so", "dev"} else labels[0]
+            brand = (
+                labels[-2]
+                if len(labels) >= 2
+                and labels[-1] in {"com", "io", "co", "net", "ai", "app", "so", "dev"}
+                else labels[0]
+            )
             if brand and brand not in {"www", "m"}:
                 # If display name is long/noisy, still use domain brand
-                if not from_name or len(from_name) > 24 or " with " in from_name.lower():
+                if (
+                    not from_name
+                    or len(from_name) > 24
+                    or " with " in from_name.lower()
+                ):
                     return brand.title(), _slug(brand)
 
     # name from display
     if from_name and len(from_name) > 1:
-        cleaned = re.sub(r"\b(inc|llc|ltd|team|noreply|no-reply|notifications?)\b", "", from_name, flags=re.I)
+        cleaned = re.sub(
+            r"\b(inc|llc|ltd|team|noreply|no-reply|notifications?)\b",
+            "",
+            from_name,
+            flags=re.I,
+        )
         cleaned = cleaned.strip(" -_|")
         if cleaned and len(cleaned) >= 2:
             return cleaned[:60], _slug(cleaned)
 
-    if domain and domain not in {"gmail.com", "googlemail.com", "outlook.com", "yahoo.com"}:
+    if domain and domain not in {
+        "gmail.com",
+        "googlemail.com",
+        "outlook.com",
+        "yahoo.com",
+    }:
         base = domain.split(".")[0]
-        if base not in {"email", "mail", "noreply", "no-reply", "notification", "notifications"}:
+        if base not in {
+            "email",
+            "mail",
+            "noreply",
+            "no-reply",
+            "notification",
+            "notifications",
+        }:
             return base.title(), _slug(base)
 
     # subject brand heuristic: first capitalized token
@@ -282,7 +366,10 @@ def _detect_cycle(text: str) -> str | None:
 def _detect_cancel_url(snippet: str) -> str | None:
     for url in URL_RE.findall(snippet or ""):
         low = url.lower()
-        if any(k in low for k in ("cancel", "unsubscribe", "manage", "billing", "subscription")):
+        if any(
+            k in low
+            for k in ("cancel", "unsubscribe", "manage", "billing", "subscription")
+        ):
             return url.rstrip(").,;]")
     # List-Unsubscribe: <https://...>
     m = re.search(r"<(https?://[^>]+)>", snippet or "", re.I)

@@ -35,7 +35,9 @@ class CalendarReadOnlyAdapter:
     ) -> list[CalendarEventLite]:
         now = datetime.now(timezone.utc)
         time_min = (now - timedelta(days=days_back)).isoformat().replace("+00:00", "Z")
-        time_max = (now + timedelta(days=days_forward)).isoformat().replace("+00:00", "Z")
+        time_max = (
+            (now + timedelta(days=days_forward)).isoformat().replace("+00:00", "Z")
+        )
         params = urllib.parse.urlencode(
             {
                 "singleEvents": "true",
@@ -53,8 +55,12 @@ class CalendarReadOnlyAdapter:
 
         events: list[CalendarEventLite] = []
         for item in resp.get("items", []) or []:
-            start = (item.get("start") or {}).get("dateTime") or (item.get("start") or {}).get("date")
-            end = (item.get("end") or {}).get("dateTime") or (item.get("end") or {}).get("date")
+            start = (item.get("start") or {}).get("dateTime") or (
+                item.get("start") or {}
+            ).get("date")
+            end = (item.get("end") or {}).get("dateTime") or (
+                item.get("end") or {}
+            ).get("date")
             events.append(
                 CalendarEventLite(
                     id=item.get("id", ""),
@@ -82,8 +88,22 @@ class CalendarReadOnlyAdapter:
 
 
 _STOP = {
-    "inc", "llc", "ltd", "the", "com", "with", "from", "team", "via",
-    "and", "for", "your", "mail", "email", "noreply", "notification",
+    "inc",
+    "llc",
+    "ltd",
+    "the",
+    "com",
+    "with",
+    "from",
+    "team",
+    "via",
+    "and",
+    "for",
+    "your",
+    "mail",
+    "email",
+    "noreply",
+    "notification",
 }
 
 

@@ -19,8 +19,8 @@ from ..infra_bridge import api_request, google_access_token
 # Query tuned for subscription / billing signals (not general inbox noise)
 DEFAULT_QUERY_PARTS = [
     "(invoice OR receipt OR renewal OR subscription OR trial OR membership",
-    "OR \"billing statement\" OR \"payment received\" OR \"your plan\"",
-    "OR \"price increase\" OR \"will renew\" OR unsubscribe OR \"cancel anytime\")",
+    'OR "billing statement" OR "payment received" OR "your plan"',
+    'OR "price increase" OR "will renew" OR unsubscribe OR "cancel anytime")',
 ]
 
 
@@ -59,7 +59,7 @@ class GmailReadOnlyAdapter:
         extra_query: str = "",
     ) -> list[str]:
         after = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y/%m/%d")
-        q = f'after:{after} {" ".join(DEFAULT_QUERY_PARTS)}'
+        q = f"after:{after} {' '.join(DEFAULT_QUERY_PARTS)}"
         if extra_query:
             q = f"{q} {extra_query}"
         ids: list[str] = []
@@ -102,8 +102,7 @@ class GmailReadOnlyAdapter:
             return None
 
         headers = {
-            h["name"]: h["value"]
-            for h in (msg.get("payload") or {}).get("headers", [])
+            h["name"]: h["value"] for h in (msg.get("payload") or {}).get("headers", [])
         }
         from_raw = headers.get("From", "")
         name, addr = _parse_from(from_raw)
