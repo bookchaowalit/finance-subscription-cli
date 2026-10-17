@@ -19,7 +19,9 @@ def get_google_creds() -> tuple[str, str, str]:
     for name in ("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REFRESH_TOKEN"):
         value = os.environ.get(name, "").strip()
         if not value:
-            raise RuntimeError(f"{name} is not set (provide Google OAuth via the environment)")
+            raise RuntimeError(
+                f"{name} is not set (provide Google OAuth via the environment)"
+            )
         values.append(value)
     return values[0], values[1], values[2]
 
@@ -29,4 +31,4 @@ def google_access_token() -> str:
     return get_access_token(client_id, client_secret, refresh_token)
 
 
-__all__ = ["api_request", "get_google_creds", "google_access_token", "get_access_token"]
+__all__ = ["api_request", "get_access_token", "get_google_creds", "google_access_token"]

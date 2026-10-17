@@ -2,9 +2,9 @@
 
 import json
 import time
-import urllib.request
-import urllib.parse
 import urllib.error
+import urllib.parse
+import urllib.request
 
 # ── Defaults ────────────────────────────────────────────────
 DEFAULT_RETRIES = 2
@@ -23,17 +23,36 @@ class GoogleOAuthError(RuntimeError):
     """
 
     def __init__(self, code: str):
-        self.code = code if code in {
-            "invalid_grant", "invalid_client", "invalid_request",
-            "unauthorized_client", "http_400", "http_401", "http_403",
-            "http_429", "http_500", "http_502", "http_503",
-        } else "unknown"
+        self.code = (
+            code
+            if code
+            in {
+                "invalid_grant",
+                "invalid_client",
+                "invalid_request",
+                "unauthorized_client",
+                "http_400",
+                "http_401",
+                "http_403",
+                "http_429",
+                "http_500",
+                "http_502",
+                "http_503",
+            }
+            else "unknown"
+        )
         super().__init__(f"google_oauth_{self.code}")
 
 
-def api_request(url, data=None, headers=None, method=None,
-                retries=DEFAULT_RETRIES, retry_delay=DEFAULT_RETRY_DELAY,
-                timeout=DEFAULT_TIMEOUT):
+def api_request(
+    url,
+    data=None,
+    headers=None,
+    method=None,
+    retries=DEFAULT_RETRIES,
+    retry_delay=DEFAULT_RETRY_DELAY,
+    timeout=DEFAULT_TIMEOUT,
+):
     """HTTP request with retry on transient failures.
 
     Args:
@@ -56,7 +75,10 @@ def api_request(url, data=None, headers=None, method=None,
     last_err = None
     for attempt in range(1 + retries):
         try:
-            req = urllib.request.Request(url, data=data, headers=headers or {}, method=method)
+            req = urllib.request.Request(
+                url, data=data, headers=headers or {}, method=method
+            )
+            # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected -- every caller passes an https Google API URL built from a module constant (gmail/calendar BASE, oauth2 token endpoint), never user input
             resp = urllib.request.urlopen(req, timeout=timeout)
             return json.loads(resp.read())
         except urllib.error.HTTPError as e:
@@ -70,10 +92,12 @@ def api_request(url, data=None, headers=None, method=None,
             except (TypeError, json.JSONDecodeError):
                 provider_error = None
             if provider_error in {
-                "invalid_grant", "invalid_client", "invalid_request",
+                "invalid_grant",
+                "invalid_client",
+                "invalid_request",
                 "unauthorized_client",
             }:
-                setattr(e, "safe_provider_error", provider_error)
+                e.safe_provider_error = provider_error
             if e.code in RETRYABLE_STATUS_CODES and attempt < retries:
                 time.sleep(retry_delay * (attempt + 1))
                 continue
@@ -98,12 +122,14 @@ def get_access_token(client_id, client_secret, refresh_token):
     Returns:
         Access token string.
     """
-    data = urllib.parse.urlencode({
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "refresh_token": refresh_token,
-        "grant_type": "refresh_token",
-    }).encode()
+    data = urllib.parse.urlencode(
+        {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "refresh_token": refresh_token,
+            "grant_type": "refresh_token",
+        }
+    ).encode()
     try:
         resp = api_request("https://oauth2.googleapis.com/token", data=data)
     except urllib.error.HTTPError as exc:

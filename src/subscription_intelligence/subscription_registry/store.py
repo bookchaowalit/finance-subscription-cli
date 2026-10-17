@@ -101,7 +101,10 @@ class RegistryStore:
 
             # Dedup evidence by message id + event type
             ev_key = (sig.source_message_id, sig.event_type)
-            have = {(e.get("source_message_id"), e.get("event_type")) for e in sub["evidence"]}
+            have = {
+                (e.get("source_message_id"), e.get("event_type"))
+                for e in sub["evidence"]
+            }
             if ev_key not in have:
                 sub["evidence"].append(sig.to_evidence_dict())
 
@@ -123,9 +126,10 @@ class RegistryStore:
                 sub["cancellation_url"] = sig.cancellation_url
             if sig.event_type == "trial":
                 sub["status"] = "trial"
-            elif sig.event_type in {"invoice", "receipt", "renewal", "payment"}:
-                if sub.get("status") != "cancelled":
-                    sub["status"] = "active"
+            elif sig.event_type in {"invoice", "receipt", "renewal", "payment"} and (
+                sub.get("status") != "cancelled"
+            ):
+                sub["status"] = "active"
 
             sub["updated_at"] = _now()
 
@@ -136,16 +140,25 @@ class RegistryStore:
             )
             # also try case-insensitive merchant keys
             for k, v in usage_by_merchant.items():
-                if k.lower() == sub["merchant"].lower() or k.lower() == sub["normalized_name"]:
+                if (
+                    k.lower() == sub["merchant"].lower()
+                    or k.lower() == sub["normalized_name"]
+                ):
                     hits.extend(v)
             if hits:
-                sub["usage_signals"] = list(dict.fromkeys(sub.get("usage_signals", []) + hits))[:20]
+                sub["usage_signals"] = list(
+                    dict.fromkeys(sub.get("usage_signals", []) + hits)
+                )[:20]
             _rollup_costs(sub)
             _estimate_renewal(sub)
 
         reg["subscriptions"] = sorted(
             existing.values(),
-            key=lambda s: (s.get("monthly_cost") is None, -(s.get("monthly_cost") or 0), s["merchant"]),
+            key=lambda s: (
+                s.get("monthly_cost") is None,
+                -(s.get("monthly_cost") or 0),
+                s["merchant"],
+            ),
         )
         reg["scanned_at"] = _now()
         reg["scan_days"] = scan_days

@@ -10,22 +10,22 @@ sys.path.insert(0, str(SRC))
 
 from subscription_intelligence.extractors.signals import extract_signals_from_message
 from subscription_intelligence.gmail_adapter.client import MessageMeta
-from subscription_intelligence.scoring.worth import apply_scores
 from subscription_intelligence.recommendations.engine import apply_recommendations
 from subscription_intelligence.reports.builder import build_report, format_report_text
+from subscription_intelligence.scoring.worth import apply_scores
 
 
 def _msg(**kwargs) -> MessageMeta:
-    base = dict(
-        id="m1",
-        thread_id="t1",
-        from_address="billing@notion.so",
-        from_name="Notion",
-        subject="Your Notion invoice",
-        date="2026-07-01",
-        snippet="Thanks for your payment of $10.00 USD for your monthly subscription.",
-        labels=["INBOX"],
-    )
+    base = {
+        "id": "m1",
+        "thread_id": "t1",
+        "from_address": "billing@notion.so",
+        "from_name": "Notion",
+        "subject": "Your Notion invoice",
+        "date": "2026-07-01",
+        "snippet": "Thanks for your payment of $10.00 USD for your monthly subscription.",
+        "labels": ["INBOX"],
+    }
     base.update(kwargs)
     return MessageMeta(**base)
 
@@ -58,8 +58,9 @@ def test_extract_vercel_renewal():
 
 
 def test_pipeline_scores_and_report():
-    from subscription_intelligence.subscription_registry.store import RegistryStore, empty_registry
-    from subscription_intelligence.extractors.signals import ExtractedSignal
+    from subscription_intelligence.subscription_registry.store import (
+        RegistryStore,
+    )
 
     store = RegistryStore(path=Path("/tmp/si-test-registry.json"))
     if store.path.exists():

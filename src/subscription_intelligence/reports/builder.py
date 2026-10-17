@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date
 from typing import Any
 
 
-def build_report(registry: dict[str, Any], *, within_days: int | None = None) -> dict[str, Any]:
+def build_report(
+    registry: dict[str, Any], *, within_days: int | None = None
+) -> dict[str, Any]:
     subs = registry.get("subscriptions") or []
     today = date.today()
     window = within_days if within_days is not None else 90
@@ -39,7 +41,9 @@ def build_report(registry: dict[str, Any], *, within_days: int | None = None) ->
         rec = s.get("recommendation") or "investigate"
         by_rec.setdefault(rec, []).append(s)
 
-    monthly_total = sum(s.get("monthly_cost") or 0 for s in subs if s.get("monthly_cost"))
+    monthly_total = sum(
+        s.get("monthly_cost") or 0 for s in subs if s.get("monthly_cost")
+    )
     annual_total = sum(s.get("annual_cost") or 0 for s in subs if s.get("annual_cost"))
 
     return {

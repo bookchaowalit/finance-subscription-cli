@@ -19,8 +19,8 @@ from ..infra_bridge import api_request, google_access_token
 # Query tuned for subscription / billing signals (not general inbox noise)
 DEFAULT_QUERY_PARTS = [
     "(invoice OR receipt OR renewal OR subscription OR trial OR membership",
-    "OR \"billing statement\" OR \"payment received\" OR \"your plan\"",
-    "OR \"price increase\" OR \"will renew\" OR unsubscribe OR \"cancel anytime\")",
+    'OR "billing statement" OR "payment received" OR "your plan"',
+    'OR "price increase" OR "will renew" OR unsubscribe OR "cancel anytime")',
 ]
 
 
@@ -59,7 +59,7 @@ class GmailReadOnlyAdapter:
         extra_query: str = "",
     ) -> list[str]:
         after = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y/%m/%d")
-        q = f'after:{after} {" ".join(DEFAULT_QUERY_PARTS)}'
+        q = f"after:{after} {' '.join(DEFAULT_QUERY_PARTS)}"
         if extra_query:
             q = f"{q} {extra_query}"
         ids: list[str] = []
@@ -82,14 +82,7 @@ class GmailReadOnlyAdapter:
 
     def get_message_meta(self, message_id: str) -> MessageMeta | None:
         """Fetch metadata + snippet only (format=metadata)."""
-        params = urllib.parse.urlencode(
-            {
-                "format": "metadata",
-                "metadataHeaders": ["From", "Subject", "Date", "List-Unsubscribe"],
-            },
-            doseq=True,
-        )
-        # urllib doseq for repeated keys is awkward; build manually
+        # Repeated metadataHeaders keys, built by hand
         url = (
             f"{self.BASE}/messages/{message_id}"
             f"?format=metadata"
@@ -98,12 +91,11 @@ class GmailReadOnlyAdapter:
         )
         try:
             msg = api_request(url, headers=self._headers())
-        except Exception:
+        except Exception:  # noqa: BLE001 - best effort: one unreadable message is skipped, not fatal
             return None
 
         headers = {
-            h["name"]: h["value"]
-            for h in (msg.get("payload") or {}).get("headers", [])
+            h["name"]: h["value"] for h in (msg.get("payload") or {}).get("headers", [])
         }
         from_raw = headers.get("From", "")
         name, addr = _parse_from(from_raw)
@@ -112,7 +104,7 @@ class GmailReadOnlyAdapter:
         if date_raw:
             try:
                 date_iso = parsedate_to_datetime(date_raw).date().isoformat()
-            except Exception:
+            except Exception:  # noqa: BLE001 - malformed Date header falls back to the raw text
                 date_iso = date_raw[:16]
 
         # List-Unsubscribe often has <https://...>
