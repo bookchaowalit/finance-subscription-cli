@@ -7,7 +7,7 @@ Operates on MessageMeta only (subject + snippet + headers) — no full body stor
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Any
 
 from ..gmail_adapter.client import MessageMeta
@@ -79,35 +79,48 @@ KNOWN_MERCHANTS: dict[str, str] = {
 EVENT_PATTERNS: list[tuple[str, re.Pattern[str], float]] = [
     (
         "price_increase",
-        re.compile(r"price\s+increase|raising\s+(our\s+)?prices|new\s+pricing", re.I),
+        re.compile(
+            r"price\s+increase|raising\s+(our\s+)?prices|new\s+pricing", re.IGNORECASE
+        ),
         0.85,
     ),
     (
         "trial",
-        re.compile(r"\bfree\s+trial\b|\btrial\s+ends?\b|\btrial\s+expir", re.I),
+        re.compile(
+            r"\bfree\s+trial\b|\btrial\s+ends?\b|\btrial\s+expir", re.IGNORECASE
+        ),
         0.8,
     ),
     (
         "renewal",
-        re.compile(r"\brenew(s|al|ing)?\b|\bauto[- ]?renew\b|\bwill\s+renew\b", re.I),
+        re.compile(
+            r"\brenew(s|al|ing)?\b|\bauto[- ]?renew\b|\bwill\s+renew\b", re.IGNORECASE
+        ),
         0.8,
     ),
-    ("invoice", re.compile(r"\binvoice\b|\bbilling\s+statement\b", re.I), 0.85),
+    (
+        "invoice",
+        re.compile(r"\binvoice\b|\bbilling\s+statement\b", re.IGNORECASE),
+        0.85,
+    ),
     (
         "receipt",
         re.compile(
-            r"\breceipt\b|\bpayment\s+received\b|\byour\s+payment\b|\bpaid\b", re.I
+            r"\breceipt\b|\bpayment\s+received\b|\byour\s+payment\b|\bpaid\b",
+            re.IGNORECASE,
         ),
         0.75,
     ),
     (
         "cancellation_link",
-        re.compile(r"\bcancel\b|\bunsubscribe\b|\bmanage\s+subscription\b", re.I),
+        re.compile(
+            r"\bcancel\b|\bunsubscribe\b|\bmanage\s+subscription\b", re.IGNORECASE
+        ),
         0.55,
     ),
     (
         "payment",
-        re.compile(r"\bsubscription\b|\bmembership\b|\byour\s+plan\b", re.I),
+        re.compile(r"\bsubscription\b|\bmembership\b|\byour\s+plan\b", re.IGNORECASE),
         0.5,
     ),
 ]
@@ -115,15 +128,15 @@ EVENT_PATTERNS: list[tuple[str, re.Pattern[str], float]] = [
 AMOUNT_RE = re.compile(
     r"(?P<currency>USD|THB|EUR|GBP|\$|฿|€|£)\s*(?P<amount>\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)"
     r"|(?P<amount2>\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)\s*(?P<currency2>USD|THB|EUR|GBP)",
-    re.I,
+    re.IGNORECASE,
 )
 
 CYCLE_RE = re.compile(
     r"\b(monthly|annual|yearly|per\s+year|per\s+month|/mo|/yr|year(?:ly)?|month(?:ly)?)\b",
-    re.I,
+    re.IGNORECASE,
 )
 
-URL_RE = re.compile(r"https?://[^\s<>\"']+", re.I)
+URL_RE = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
 
 
 @dataclass
@@ -175,7 +188,7 @@ def extract_signals_from_message(msg: MessageMeta) -> list[ExtractedSignal]:
         if known and re.search(
             r"bill|plan|member|account|receipt|invoice|subscri|renew|trial|payment|charge",
             text,
-            re.I,
+            re.IGNORECASE,
         ):
             event_type, base_conf = "payment", 0.45
         else:
@@ -279,14 +292,17 @@ def _detect_merchant(
                 and labels[-1] in {"com", "io", "co", "net", "ai", "app", "so", "dev"}
                 else labels[0]
             )
-            if brand and brand not in {"www", "m"}:
-                # If display name is long/noisy, still use domain brand
-                if (
+            # If display name is long/noisy, still use domain brand
+            if (
+                brand
+                and brand not in {"www", "m"}
+                and (
                     not from_name
                     or len(from_name) > 24
                     or " with " in from_name.lower()
-                ):
-                    return brand.title(), _slug(brand)
+                )
+            ):
+                return brand.title(), _slug(brand)
 
     # name from display
     if from_name and len(from_name) > 1:
@@ -294,7 +310,7 @@ def _detect_merchant(
             r"\b(inc|llc|ltd|team|noreply|no-reply|notifications?)\b",
             "",
             from_name,
-            flags=re.I,
+            flags=re.IGNORECASE,
         )
         cleaned = cleaned.strip(" -_|")
         if cleaned and len(cleaned) >= 2:
@@ -372,7 +388,7 @@ def _detect_cancel_url(snippet: str) -> str | None:
         ):
             return url.rstrip(").,;]")
     # List-Unsubscribe: <https://...>
-    m = re.search(r"<(https?://[^>]+)>", snippet or "", re.I)
+    m = re.search(r"<(https?://[^>]+)>", snippet or "", re.IGNORECASE)
     if m:
         return m.group(1)
     return None

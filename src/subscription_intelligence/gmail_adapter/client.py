@@ -82,14 +82,7 @@ class GmailReadOnlyAdapter:
 
     def get_message_meta(self, message_id: str) -> MessageMeta | None:
         """Fetch metadata + snippet only (format=metadata)."""
-        params = urllib.parse.urlencode(
-            {
-                "format": "metadata",
-                "metadataHeaders": ["From", "Subject", "Date", "List-Unsubscribe"],
-            },
-            doseq=True,
-        )
-        # urllib doseq for repeated keys is awkward; build manually
+        # Repeated metadataHeaders keys, built by hand
         url = (
             f"{self.BASE}/messages/{message_id}"
             f"?format=metadata"
@@ -98,7 +91,7 @@ class GmailReadOnlyAdapter:
         )
         try:
             msg = api_request(url, headers=self._headers())
-        except Exception:
+        except Exception:  # noqa: BLE001 - best effort: one unreadable message is skipped, not fatal
             return None
 
         headers = {
@@ -111,7 +104,7 @@ class GmailReadOnlyAdapter:
         if date_raw:
             try:
                 date_iso = parsedate_to_datetime(date_raw).date().isoformat()
-            except Exception:
+            except Exception:  # noqa: BLE001 - malformed Date header falls back to the raw text
                 date_iso = date_raw[:16]
 
         # List-Unsubscribe often has <https://...>

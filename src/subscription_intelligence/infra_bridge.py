@@ -31,4 +31,4 @@ def google_access_token() -> str:
     return get_access_token(client_id, client_secret, refresh_token)
 
 
-__all__ = ["api_request", "get_google_creds", "google_access_token", "get_access_token"]
+__all__ = ["api_request", "get_access_token", "get_google_creds", "google_access_token"]

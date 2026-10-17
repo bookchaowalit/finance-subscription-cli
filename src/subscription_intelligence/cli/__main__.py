@@ -22,7 +22,7 @@ if str(_SRC) not in sys.path:
 from subscription_intelligence.calendar_adapter import CalendarReadOnlyAdapter
 from subscription_intelligence.extractors import extract_signals_from_message
 from subscription_intelligence.gmail_adapter import GmailReadOnlyAdapter
-from subscription_intelligence.paths import REGISTRY_PATH, REPORTS_DIR, ensure_data_dirs
+from subscription_intelligence.paths import REPORTS_DIR, ensure_data_dirs
 from subscription_intelligence.recommendations import apply_recommendations
 from subscription_intelligence.reports.builder import (
     build_report,
@@ -83,7 +83,7 @@ def cmd_scan(args: argparse.Namespace) -> int:
     try:
         profile = gmail.profile()
         print(f"   Account: {profile.get('emailAddress')}")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - CLI auth check reports any failure to the user
         print(f"❌ Gmail auth failed: {e}", file=sys.stderr)
         print(
             "   Re-auth: refresh GOOGLE_REFRESH_TOKEN in your secret manager",

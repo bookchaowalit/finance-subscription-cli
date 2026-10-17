@@ -2,9 +2,9 @@
 
 import json
 import time
-import urllib.request
-import urllib.parse
 import urllib.error
+import urllib.parse
+import urllib.request
 
 # ── Defaults ────────────────────────────────────────────────
 DEFAULT_RETRIES = 2
@@ -96,7 +96,7 @@ def api_request(
                 "invalid_request",
                 "unauthorized_client",
             }:
-                setattr(e, "safe_provider_error", provider_error)
+                e.safe_provider_error = provider_error
             if e.code in RETRYABLE_STATUS_CODES and attempt < retries:
                 time.sleep(retry_delay * (attempt + 1))
                 continue

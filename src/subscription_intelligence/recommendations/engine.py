@@ -101,7 +101,6 @@ def _recommend(sub: dict[str, Any]) -> tuple[str, str]:
 
 
 def _mark_duplicates(subs: list[dict[str, Any]]) -> None:
-    by_id = {s["normalized_name"]: s for s in subs}
     for group in OVERLAP_GROUPS:
         present = [s for s in subs if s["normalized_name"] in group or s["id"] in group]
         # also match if normalized name is in group

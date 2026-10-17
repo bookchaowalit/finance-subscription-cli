@@ -126,9 +126,10 @@ class RegistryStore:
                 sub["cancellation_url"] = sig.cancellation_url
             if sig.event_type == "trial":
                 sub["status"] = "trial"
-            elif sig.event_type in {"invoice", "receipt", "renewal", "payment"}:
-                if sub.get("status") != "cancelled":
-                    sub["status"] = "active"
+            elif sig.event_type in {"invoice", "receipt", "renewal", "payment"} and (
+                sub.get("status") != "cancelled"
+            ):
+                sub["status"] = "active"
 
             sub["updated_at"] = _now()
 

@@ -5,7 +5,6 @@ from __future__ import annotations
 import urllib.parse
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Any
 
 from .infra_bridge import api_request, google_access_token
 
@@ -50,7 +49,7 @@ class CalendarReadOnlyAdapter:
         url = f"{self.BASE}/calendars/primary/events?{params}"
         try:
             resp = api_request(url, headers=self._headers())
-        except Exception:
+        except Exception:  # noqa: BLE001 - calendar is optional enrichment; failure means no events
             return []
 
         events: list[CalendarEventLite] = []
