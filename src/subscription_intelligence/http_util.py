@@ -78,6 +78,7 @@ def api_request(
             req = urllib.request.Request(
                 url, data=data, headers=headers or {}, method=method
             )
+            # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected -- every caller passes an https Google API URL built from a module constant (gmail/calendar BASE, oauth2 token endpoint), never user input
             resp = urllib.request.urlopen(req, timeout=timeout)
             return json.loads(resp.read())
         except urllib.error.HTTPError as e:
