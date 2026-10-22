@@ -148,10 +148,12 @@ collection bounds do not limit the age or overall size of the saved registry.
 
 ## Offline verification
 
-No Google account or credentials are needed for the synthetic extractor tests:
+No Google account or credentials are needed for the test suite (synthetic messages,
+HTTP mocked, temp files only):
 
 ```bash
-python3 tests/test_extractors.py
+uv sync --frozen --all-extras
+uv run ruff check . && uv run mypy . && uv run pytest -q
 # Scope-literal audit: currently no declarations in src (zero matches).
 rg -n 'googleapis.com/auth/' src
 ```
