@@ -79,23 +79,17 @@ KNOWN_MERCHANTS: dict[str, str] = {
 EVENT_PATTERNS: list[tuple[str, re.Pattern[str], float]] = [
     (
         "price_increase",
-        re.compile(
-            r"price\s+increase|raising\s+(our\s+)?prices|new\s+pricing", re.IGNORECASE
-        ),
+        re.compile(r"price\s+increase|raising\s+(our\s+)?prices|new\s+pricing", re.IGNORECASE),
         0.85,
     ),
     (
         "trial",
-        re.compile(
-            r"\bfree\s+trial\b|\btrial\s+ends?\b|\btrial\s+expir", re.IGNORECASE
-        ),
+        re.compile(r"\bfree\s+trial\b|\btrial\s+ends?\b|\btrial\s+expir", re.IGNORECASE),
         0.8,
     ),
     (
         "renewal",
-        re.compile(
-            r"\brenew(s|al|ing)?\b|\bauto[- ]?renew\b|\bwill\s+renew\b", re.IGNORECASE
-        ),
+        re.compile(r"\brenew(s|al|ing)?\b|\bauto[- ]?renew\b|\bwill\s+renew\b", re.IGNORECASE),
         0.8,
     ),
     (
@@ -113,9 +107,7 @@ EVENT_PATTERNS: list[tuple[str, re.Pattern[str], float]] = [
     ),
     (
         "cancellation_link",
-        re.compile(
-            r"\bcancel\b|\bunsubscribe\b|\bmanage\s+subscription\b", re.IGNORECASE
-        ),
+        re.compile(r"\bcancel\b|\bunsubscribe\b|\bmanage\s+subscription\b", re.IGNORECASE),
         0.55,
     ),
     (
@@ -171,9 +163,7 @@ class ExtractedSignal:
 def extract_signals_from_message(msg: MessageMeta) -> list[ExtractedSignal]:
     text = f"{msg.subject} {msg.snippet}"
     event_type, base_conf = _detect_event(text)
-    merchant, normalized = _detect_merchant(
-        msg.from_address, msg.from_name, msg.subject
-    )
+    merchant, normalized = _detect_merchant(msg.from_address, msg.from_name, msg.subject)
     if not merchant:
         return []
 
@@ -181,10 +171,7 @@ def extract_signals_from_message(msg: MessageMeta) -> list[ExtractedSignal]:
     if not event_type:
         addr = (msg.from_address or "").lower()
         domain = addr.split("@")[-1] if "@" in addr else ""
-        known = any(
-            domain == d or domain.endswith("." + d) or d in domain
-            for d in KNOWN_MERCHANTS
-        )
+        known = any(domain == d or domain.endswith("." + d) or d in domain for d in KNOWN_MERCHANTS)
         if known and re.search(
             r"bill|plan|member|account|receipt|invoice|subscri|renew|trial|payment|charge",
             text,
@@ -233,9 +220,7 @@ def _detect_event(text: str) -> tuple[str | None, float]:
     return None, 0.0
 
 
-def _detect_merchant(
-    from_addr: str, from_name: str, subject: str
-) -> tuple[str | None, str]:
+def _detect_merchant(from_addr: str, from_name: str, subject: str) -> tuple[str | None, str]:
     addr = (from_addr or "").lower()
     domain = addr.split("@")[-1] if "@" in addr else ""
     # strip common mail subdomains
@@ -296,11 +281,7 @@ def _detect_merchant(
             if (
                 brand
                 and brand not in {"www", "m"}
-                and (
-                    not from_name
-                    or len(from_name) > 24
-                    or " with " in from_name.lower()
-                )
+                and (not from_name or len(from_name) > 24 or " with " in from_name.lower())
             ):
                 return brand.title(), _slug(brand)
 
@@ -382,10 +363,7 @@ def _detect_cycle(text: str) -> str | None:
 def _detect_cancel_url(snippet: str) -> str | None:
     for url in URL_RE.findall(snippet or ""):
         low = url.lower()
-        if any(
-            k in low
-            for k in ("cancel", "unsubscribe", "manage", "billing", "subscription")
-        ):
+        if any(k in low for k in ("cancel", "unsubscribe", "manage", "billing", "subscription")):
             return url.rstrip(").,;]")
     # List-Unsubscribe: <https://...>
     m = re.search(r"<(https?://[^>]+)>", snippet or "", re.IGNORECASE)

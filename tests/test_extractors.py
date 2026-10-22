@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any
 
 SRC = Path(__file__).resolve().parents[1] / "src"
 sys.path.insert(0, str(SRC))
@@ -15,8 +16,8 @@ from subscription_intelligence.reports.builder import build_report, format_repor
 from subscription_intelligence.scoring.worth import apply_scores
 
 
-def _msg(**kwargs) -> MessageMeta:
-    base = {
+def _msg(**kwargs: Any) -> MessageMeta:
+    base: dict[str, Any] = {
         "id": "m1",
         "thread_id": "t1",
         "from_address": "billing@notion.so",

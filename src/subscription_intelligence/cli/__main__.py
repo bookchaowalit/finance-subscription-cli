@@ -41,15 +41,9 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_scan = sub.add_parser("scan", help="Scan Gmail (+ Calendar) and update registry")
-    p_scan.add_argument(
-        "--days", type=int, default=365, help="Lookback days (default 365)"
-    )
-    p_scan.add_argument(
-        "--max", type=int, default=200, help="Max Gmail messages to fetch"
-    )
-    p_scan.add_argument(
-        "--no-calendar", action="store_true", help="Skip calendar usage signals"
-    )
+    p_scan.add_argument("--days", type=int, default=365, help="Lookback days (default 365)")
+    p_scan.add_argument("--max", type=int, default=200, help="Max Gmail messages to fetch")
+    p_scan.add_argument("--no-calendar", action="store_true", help="Skip calendar usage signals")
     p_scan.add_argument(
         "--fresh",
         action="store_true",
@@ -164,9 +158,7 @@ def cmd_report(args: argparse.Namespace) -> int:
     store = RegistryStore()
     reg = store.load()
     if not reg.get("subscriptions"):
-        print(
-            "Registry empty. Run: subscription-intel scan --days 365", file=sys.stderr
-        )
+        print("Registry empty. Run: subscription-intel scan --days 365", file=sys.stderr)
         return 1
     within = _parse_within(args.within)
     report = build_report(reg, within_days=within)
@@ -186,18 +178,12 @@ def cmd_renewals(args: argparse.Namespace) -> int:
     store = RegistryStore()
     reg = store.load()
     if not reg.get("subscriptions"):
-        print(
-            "Registry empty. Run: subscription-intel scan --days 365", file=sys.stderr
-        )
+        print("Registry empty. Run: subscription-intel scan --days 365", file=sys.stderr)
         return 1
     within = _parse_within(args.within)
     report = build_report(reg, within_days=within)
     if args.json:
-        print(
-            json.dumps(
-                report.get("upcoming_renewals") or [], indent=2, ensure_ascii=False
-            )
-        )
+        print(json.dumps(report.get("upcoming_renewals") or [], indent=2, ensure_ascii=False))
     else:
         print(format_renewals_text(report))
     return 0

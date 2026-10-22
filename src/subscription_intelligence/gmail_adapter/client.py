@@ -94,9 +94,7 @@ class GmailReadOnlyAdapter:
         except Exception:  # noqa: BLE001 - best effort: one unreadable message is skipped, not fatal
             return None
 
-        headers = {
-            h["name"]: h["value"] for h in (msg.get("payload") or {}).get("headers", [])
-        }
+        headers = {h["name"]: h["value"] for h in (msg.get("payload") or {}).get("headers", [])}
         from_raw = headers.get("From", "")
         name, addr = _parse_from(from_raw)
         date_raw = headers.get("Date")

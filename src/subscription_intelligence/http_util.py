@@ -75,9 +75,7 @@ def api_request(
     last_err = None
     for attempt in range(1 + retries):
         try:
-            req = urllib.request.Request(
-                url, data=data, headers=headers or {}, method=method
-            )
+            req = urllib.request.Request(url, data=data, headers=headers or {}, method=method)
             # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected -- every caller passes an https Google API URL built from a module constant (gmail/calendar BASE, oauth2 token endpoint), never user input
             resp = urllib.request.urlopen(req, timeout=timeout)
             return json.loads(resp.read())
@@ -97,7 +95,8 @@ def api_request(
                 "invalid_request",
                 "unauthorized_client",
             }:
-                e.safe_provider_error = provider_error
+                # Ad-hoc attribute read back with getattr() in get_access_token.
+                e.safe_provider_error = provider_error  # type: ignore[attr-defined]
             if e.code in RETRYABLE_STATUS_CODES and attempt < retries:
                 time.sleep(retry_delay * (attempt + 1))
                 continue

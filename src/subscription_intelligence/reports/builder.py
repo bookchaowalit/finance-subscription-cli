@@ -6,9 +6,7 @@ from datetime import date
 from typing import Any
 
 
-def build_report(
-    registry: dict[str, Any], *, within_days: int | None = None
-) -> dict[str, Any]:
+def build_report(registry: dict[str, Any], *, within_days: int | None = None) -> dict[str, Any]:
     subs = registry.get("subscriptions") or []
     today = date.today()
     window = within_days if within_days is not None else 90
@@ -41,9 +39,7 @@ def build_report(
         rec = s.get("recommendation") or "investigate"
         by_rec.setdefault(rec, []).append(s)
 
-    monthly_total = sum(
-        s.get("monthly_cost") or 0 for s in subs if s.get("monthly_cost")
-    )
+    monthly_total = sum(s.get("monthly_cost") or 0 for s in subs if s.get("monthly_cost"))
     annual_total = sum(s.get("annual_cost") or 0 for s in subs if s.get("annual_cost"))
 
     return {
@@ -129,9 +125,7 @@ def format_report_text(report: dict[str, Any]) -> str:
         lines.append("Draft cancel/investigate checklist (human approval required)")
         for d in drafts:
             url = d.get("cancellation_url") or "no url captured"
-            lines.append(
-                f"- [{d.get('status')}] {d.get('action')} {d.get('merchant')} — {url}"
-            )
+            lines.append(f"- [{d.get('status')}] {d.get('action')} {d.get('merchant')} — {url}")
         lines.append("")
 
     lines.append(
