@@ -200,7 +200,7 @@ def _estimate_renewal(sub: dict[str, Any]) -> None:
         return
     cycle = sub.get("billing_cycle") or "monthly"
     if cycle == "annual":
-        nxt = date(d.year + 1, d.month, d.day)
+        nxt = _add_year(d)
     elif cycle == "weekly":
         from datetime import timedelta
 
@@ -216,13 +216,21 @@ def _estimate_renewal(sub: dict[str, Any]) -> None:
     today = date.today()
     if nxt < today:
         if cycle == "annual":
-            nxt = date(nxt.year + 1, nxt.month, nxt.day)
+            nxt = _add_year(nxt)
         else:
             month = nxt.month + 1
             year = nxt.year + (1 if month > 12 else 0)
             month = month if month <= 12 else 1
             nxt = date(year, month, min(nxt.day, 28))
     sub["next_renewal_date"] = nxt.isoformat()
+
+
+def _add_year(d: date) -> date:
+    """Same day next year; 29 Feb falls back to 28 Feb."""
+    try:
+        return d.replace(year=d.year + 1)
+    except ValueError:
+        return d.replace(year=d.year + 1, day=28)
 
 
 def _now() -> str:
